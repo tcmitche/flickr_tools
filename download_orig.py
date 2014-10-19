@@ -10,8 +10,8 @@ config.read('conf')
 flickr.API_KEY = config.get('ApiCredentials', 'key')
 flickr.API_SECRET = config.get('ApiCredentials', 'secret')
 
-setId = '72157648278345450'
-photoDir = 'photos'
+setId = config.get('Info', 'set_id')
+photoDir = config.get('Info', 'photo_dir')
 
 if not os.path.exists(photoDir):
     os.makedirs(photoDir)
