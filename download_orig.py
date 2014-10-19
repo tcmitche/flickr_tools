@@ -19,9 +19,10 @@ if not os.path.exists(photoDir):
 print('Calling flickr for set: %s' % setId)
 photos = flickr.Photoset(setId).getPhotos()
 
-# for p in photos:
-p = photos[0]
-pUrl = 'https://farm%s.staticflickr.com/%s/%s_%s_o.%s' % (p.farm, p.server, p.id, p.originalsecret, p.originalformat)
-f = open('%s/%s.%s' % (photoDir, p.id, p.originalformat), 'wb')
-f.write(urllib.urlopen(pUrl).read())
-f.close()
+for p in photos:
+    pUrl = 'https://farm%s.staticflickr.com/%s/%s_%s_o.%s' % (p.farm, p.server, p.id, p.originalsecret, p.originalformat)
+    f = open('%s/%s.%s' % (photoDir, p.id, p.originalformat), 'wb')
+    print('Getting photo %s...' % pUrl)
+    f.write(urllib.urlopen(pUrl).read())
+    print('done!')
+    f.close()
