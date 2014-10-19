@@ -69,7 +69,8 @@ class Photo(object):
                  isfriend=None, isfamily=None, cancomment=None, \
                  canaddmeta=None, comments=None, tags=None, secret=None, \
                  isfavorite=None, server=None, farm=None, license=None, \
-                 rotation=None, url=None, views=None):
+                 rotation=None, url=None, views=None, \
+                 originalsecret=None, originalformat=None):
         """Must specify id, rest is optional."""
         self.__loaded = False
         self.__cancomment = cancomment
@@ -90,6 +91,8 @@ class Photo(object):
         self.__farm = farm
         self.__tags = tags
         self.__title = title
+        self.originalsecret = originalsecret
+        self.originalformat = originalformat
         
         self.__dateposted = None
         self.__datetaken = None
@@ -458,7 +461,7 @@ class Photoset(object):
     def getPhotos(self):
         """Returns list of Photos."""
         method = 'flickr.photosets.getPhotos'
-        data = _doget(method, photoset_id=self.id)
+        data = _doget(method, photoset_id=self.id, extras='original_format')
         photos = data.rsp.photoset.photo
         p = []
 
@@ -471,7 +474,9 @@ class Photoset(object):
 
         for photo in photos:
             p.append(Photo(photo.id, title=photo.title, secret=photo.secret, \
-                           server=photo.server))
+                           server=photo.server, farm=photo.farm, \
+                           originalsecret=photo.originalsecret, \
+                           originalformat=photo.originalformat))
         return p    
 
     def editPhotos(self, photos, primary=None):
@@ -989,7 +994,7 @@ def photos_search_pages(user_id='', auth=False,  tags='', tag_mode='', text='',\
                   license='', per_page='', page='', sort=''):
     """Returns the number of pages for the previous function (photos_search())
     """
-	
+    
     method = 'flickr.photos.search'
 
     data = _doget(method, auth=auth, user_id=user_id, tags=tags, text=text,\
@@ -999,7 +1004,7 @@ def photos_search_pages(user_id='', auth=False,  tags='', tag_mode='', text='',\
                   max_taken_date=max_taken_date, \
                   license=license, per_page=per_page,\
                   page=page, sort=sort)
-	
+    
     return data.rsp.photos.pages
 
 def photos_get_recent(extras='', per_page='', page=''):
@@ -1015,8 +1020,8 @@ def photos_get_recent(extras='', per_page='', page=''):
         else:
             photos = [_parse_photo(data.rsp.photos.photo)]
     return photos    
-	
-	
+    
+    
 #XXX: Could be class method in User
 def people_findByEmail(email):
     """Returns User object."""
@@ -1277,8 +1282,8 @@ def _get_api_sig(params):
                 api_string.append(item)
                 api_string.append(str(chocolate[1]))
         if item == 'api_key':
-        	api_string.append('api_key')
-        	api_string.append(API_KEY)
+            api_string.append('api_key')
+            api_string.append(API_KEY)
         if item == 'auth_token':
             api_string.append('auth_token')
             api_string.append(token)
@@ -1434,7 +1439,7 @@ class Blogs():
                 return "Unknown error!"
         except AttributeError:
             return "There are no blogs!"
-		
+        
         myReturn = [bID,bName,bNeedsPword,bURL]
         return myReturn
 
